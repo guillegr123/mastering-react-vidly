@@ -2,7 +2,8 @@ import React from "react";
 import _ from "lodash"; // Optimized version of Underscore.js
 
 const Pagination = props => {
-  const { itemsCount, pageSize } = props;
+  const { itemsCount, pageSize, currentPage, onPageChange } = props;
+  console.log(currentPage);
 
   const pagesCount = Math.ceil(itemsCount / pageSize);
   if (pagesCount === 1) return null; // Nothing will be rendered
@@ -10,10 +11,15 @@ const Pagination = props => {
 
   return (
     <nav>
-      <ul class="pagination">
+      <ul className="pagination">
         {pages.map(page => (
-          <li key={page} class="page-item">
-            <a class="page-link">{page}</a>
+          <li
+            key={page}
+            className={page === currentPage ? "page-item active" : "page-item"}
+          >
+            <a className="page-link" onClick={() => onPageChange(page)}>
+              {page}
+            </a>
           </li>
         ))}
       </ul>
