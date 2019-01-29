@@ -3,9 +3,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import _ from "lodash"; // Optimized version of Underscore.js
 
-const Pagination = props => {
-  const { itemsCount, pageSize, currentPage, onPageChange } = props;
-
+const Pagination = ({ itemsCount, pageSize, currentPage, onPageChange }) => {
   const pagesCount = Math.ceil(itemsCount / pageSize);
   if (pagesCount === 1) return null; // Nothing will be rendered
   const pages = _.range(1, pagesCount + 1);
