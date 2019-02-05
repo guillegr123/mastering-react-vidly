@@ -2,6 +2,8 @@ import React, { Component } from "react";
 
 class LoginForm extends Component {
   state = {
+    // If any property of the controlled element is undefined, there will be a warning
+    // If any property of the controlled element is null, there will be an error
     account: { username: "", password: "" }
   };
 
