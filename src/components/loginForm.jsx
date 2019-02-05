@@ -5,11 +5,20 @@ class LoginForm extends Component {
   state = {
     // If any property of the controlled element is undefined, there will be a warning
     // If any property of the controlled element is null, there will be an error
-    account: { username: "", password: "" }
+    account: { username: "", password: "" },
+    errors: {}
+  };
+
+  validate = () => {
+    return { username: "Username is required." };
   };
 
   handleSubmit = e => {
     e.preventDefault();
+
+    const errors = this.validate();
+    this.setState({ errors });
+    if (errors) return;
 
     // Call the server
     console.log("Submitted");
