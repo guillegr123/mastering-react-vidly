@@ -28,7 +28,7 @@ class RegisterForm extends Form {
       .label("Password"),
     name: Joi.string()
       .required()
-      .label("Password")
+      .label("Name")
   };
 
   doSubmit = () => {
