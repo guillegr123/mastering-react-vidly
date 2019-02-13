@@ -6,9 +6,14 @@ import { getMovie, saveMovie } from "../services/fakeMovieService";
 
 class MovieForm extends Form {
   state = {
-    data: { title: "", genreId: "", numberInStock: "", dailyRentalRate: "" },
-    errors: {},
-    genres: []
+    data: {
+      title: "",
+      genreId: "",
+      numberInStock: "",
+      dailyRentalRate: ""
+    },
+    genres: [],
+    errors: {}
   };
 
   schema = {
@@ -18,14 +23,13 @@ class MovieForm extends Form {
       .label("Title"),
     genreId: Joi.string()
       .required()
-      .min(5)
       .label("Genre"),
     numberInStock: Joi.number()
       .required()
       .integer()
       .min(0)
       .max(100)
-      .label("Number In Stock"),
+      .label("Number in Stock"),
     dailyRentalRate: Joi.number()
       .required()
       .precision(1)
@@ -36,46 +40,40 @@ class MovieForm extends Form {
 
   componentDidMount() {
     const genres = getGenres();
-    genres.unshift({ _id: "", name: "" });
+    this.setState({ genres });
 
-    const stateChanges = { genres };
+    const movieId = this.props.match.params.id;
+    if (movieId === "new") return;
 
-    const { history, match } = this.props;
+    const movie = getMovie(movieId);
+    if (!movie) return this.props.history.replace("/not-found");
 
-    const movieId = match.params.id;
+    this.setState({ data: this.mapToViewModel(movie) });
+  }
 
-    if (match.params.id) {
-      const movie = getMovie(movieId);
-
-      if (!movie) {
-        history.replace("/not-found");
-        return;
-      }
-
-      const { genre, ...movieData } = movie;
-
-      movieData.genreId = genre._id;
-
-      stateChanges.data = movieData;
-    }
-
-    this.setState(stateChanges);
+  mapToViewModel(movie) {
+    return {
+      _id: movie._id,
+      title: movie.title,
+      genreId: movie.genre._id,
+      numberInStock: movie.numberInStock,
+      dailyRentalRate: movie.dailyRentalRate
+    };
   }
 
   doSubmit = () => {
     saveMovie(this.state.data);
+
     this.props.history.push("/movies");
   };
 
   render() {
-    const { genres } = this.state;
-
     return (
       <div>
         <h1>Movie Form</h1>
         <form onSubmit={this.handleSubmit}>
           {this.renderInput("title", "Title")}
-          {this.renderSelect("genreId", "Genre", genres, "_id", "name")}
+          {this.renderSelect("genreId", "Genre", this.state.genres)}
           {this.renderInput("numberInStock", "Number in Stock")}
           {this.renderInput("dailyRentalRate", "Rate")}
           {this.renderButton("Save")}

@@ -71,20 +71,14 @@ class Form extends Component {
     );
   }
 
-  renderSelect(name, label, items, valueProperty, textProperty) {
+  renderSelect(name, label, options) {
     const { data, errors } = this.state;
-
-    const options = {
-      textProperty,
-      valueProperty,
-      items
-    };
 
     return (
       <Select
         name={name}
-        label={label}
         value={data[name]}
+        label={label}
         options={options}
         onChange={this.handleChange}
         error={errors[name]}
