@@ -7,6 +7,7 @@ import { getMovies, deleteMovie } from "../services/fakeMovieService";
 import { getGenres } from "../services/fakeGenreService";
 import { paginate } from "../utils/paginate";
 import _ from "lodash";
+import SearchBox from "./searchBox";
 
 class Movies extends Component {
   state = {
@@ -14,8 +15,9 @@ class Movies extends Component {
     genres: [],
     currentPage: 1,
     pageSize: 4,
-    sortColumn: { path: "title", order: "asc" },
-    searchText: ""
+    searchQuery: "",
+    selectedGenre: null,
+    sortColumn: { path: "title", order: "asc" }
   };
 
   componentDidMount() {
@@ -51,18 +53,18 @@ class Movies extends Component {
   handleGenreSelect = genre => {
     this.setState({
       selectedGenre: genre,
-      currentPage: 1, // Reset the currentPage to 1, in order to prevent to try to show an
+      searchQuery: "",
+      currentPage: 1 // Reset the currentPage to 1, in order to prevent to try to show an
       // inexistent page when filering, because it may reduce the amount of movies on display
-      searchText: ""
     });
+  };
+
+  handleSearch = query => {
+    this.setState({ searchQuery: query, selectedGenre: null, currentPage: 1 });
   };
 
   handleSort = sortColumn => {
     this.setState({ sortColumn });
-  };
-
-  handleSearchChange = ({ currentTarget: input }) => {
-    this.setState({ searchText: input.value, selectedGenre: null });
   };
 
   getPagedData = () => {
@@ -71,21 +73,19 @@ class Movies extends Component {
       currentPage,
       sortColumn,
       selectedGenre,
-      searchText,
+      searchQuery,
       movies: allMovies
     } = this.state;
 
-    const searchTextCleaned = searchText.trim().toLowerCase();
-
     // 1. Filter
-    const filtered =
-      selectedGenre && selectedGenre._id
-        ? allMovies.filter(m => m.genre._id === selectedGenre._id)
-        : searchText
-        ? allMovies.filter(m =>
-            m.title.toLowerCase().includes(searchTextCleaned)
-          )
-        : allMovies;
+    let filtered = allMovies;
+
+    if (searchQuery)
+      filtered = allMovies.filter(m =>
+        m.title.toLowerCase().startsWith(searchQuery.toLowerCase())
+      );
+    else if (selectedGenre && selectedGenre._id)
+      filtered = allMovies.filter(m => m.genre._id === selectedGenre._id);
 
     // 2. Sort
     const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
@@ -101,7 +101,7 @@ class Movies extends Component {
       pageSize,
       currentPage,
       sortColumn,
-      searchText,
+      searchQuery,
       movies: allMovies
     } = this.state;
     const { length: count } = allMovies;
@@ -131,16 +131,7 @@ class Movies extends Component {
             New Movie
           </Link>
           <p>Showing {totalCount} movies in the database.</p>
-          <p>
-            <input
-              type="text"
-              className="form-control"
-              id="search"
-              placeholder="Search..."
-              value={searchText}
-              onChange={this.handleSearchChange}
-            />
-          </p>
+          <SearchBox value={searchQuery} onChange={this.handleSearch} />
           <MoviesTable
             movies={movies}
             sortColumn={sortColumn}
