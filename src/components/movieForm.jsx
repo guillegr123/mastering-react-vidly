@@ -1,8 +1,9 @@
 import React from "react";
 import Joi from "joi-browser";
+import { toast } from "react-toastify";
 import Form from "./common/form";
-import { getGenres } from "../services/fakeGenreService";
-import { getMovie, saveMovie } from "../services/fakeMovieService";
+import { getGenres } from "../services/genreService";
+import { getMovie, saveMovie } from "../services/movieService";
 
 class MovieForm extends Form {
   state = {
@@ -38,14 +39,14 @@ class MovieForm extends Form {
       .label("Daily Rental Rate")
   };
 
-  componentDidMount() {
-    const genres = getGenres();
+  async componentDidMount() {
+    const { data: genres } = await getGenres();
     this.setState({ genres });
 
     const movieId = this.props.match.params.id;
     if (movieId === "new") return;
 
-    const movie = getMovie(movieId);
+    const { data: movie } = await getMovie(movieId);
     if (!movie) return this.props.history.replace("/not-found");
 
     this.setState({ data: this.mapToViewModel(movie) });
@@ -61,10 +62,27 @@ class MovieForm extends Form {
     };
   }
 
-  doSubmit = () => {
-    saveMovie(this.state.data);
+  doSubmit = async () => {
+    try {
+      await saveMovie(this.state.data);
 
-    this.props.history.push("/movies");
+      this.props.history.push("/movies");
+    } catch (ex) {
+      if (ex.response) {
+        switch (ex.response.status) {
+          case 400:
+            toast.error("Movie has invalid data.");
+            return;
+          case 404:
+            toast.error("Movie does not exist.");
+            return;
+          default:
+            break;
+        }
+      }
+
+      toast.error("An error occurred while saving the movie.");
+    }
   };
 
   render() {
