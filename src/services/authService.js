@@ -21,15 +21,20 @@ export function logout() {
 export function getCurrentUser() {
   try {
     const jwt = localStorage.getItem("token");
-    return jwtDecode(jwt);
+    return jwtDecode(jwt); // Online tool to check JWT: https://jwt.io/#debugger-io
   } catch (ex) {
     return null;
   }
+}
+
+export function getJwt() {
+  return localStorage.getItem(tokenKey);
 }
 
 export default {
   login,
   loginWithJwt,
   logout,
-  getCurrentUser
+  getCurrentUser,
+  getJwt
 };
