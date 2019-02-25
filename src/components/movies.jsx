@@ -147,6 +147,7 @@ class Movies extends Component {
           <MoviesTable
             movies={movies}
             sortColumn={sortColumn}
+            enableDelete={!!user}
             onLike={this.handleLike}
             onDelete={this.handleDelete}
             onSort={this.handleSort}
