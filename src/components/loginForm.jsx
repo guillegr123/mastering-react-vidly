@@ -25,7 +25,7 @@ class LoginForm extends Form {
       const { data } = this.state;
       const { data: jwt } = await login(data.username, data.password);
       localStorage.setItem("token", jwt);
-      this.props.history.push("/");
+      window.location = "/"; // To force to reload the page, causing the App component to be mounted
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         const errors = { ...this.state.errors };

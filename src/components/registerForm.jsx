@@ -36,7 +36,7 @@ class RegisterForm extends Form {
     try {
       const response = await userService.register(this.state.data);
       localStorage.setItem("token", response.headers["x-auth-token"]);
-      this.props.history.push("/");
+      window.location = "/"; // To force to reload the page, causing the App component to be mounted
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         const errors = { ...this.state.errors }; // Clone to not to modify state directly
