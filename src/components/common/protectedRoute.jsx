@@ -7,7 +7,15 @@ const ProtectedRoute = ({ component: Component, render, ...rest }) => {
     <Route
       {...rest} // To pass any additional properties
       render={props => {
-        if (!auth.getCurrentUser()) return <Redirect to="/login" />;
+        if (!auth.getCurrentUser())
+          return (
+            <Redirect
+              to={{
+                pathname: "/login",
+                state: { from: props.location }
+              }}
+            />
+          );
         return Component ? <Component {...props} /> : render(props); // Component should start with capital letter, so the transpiler for React does not complains
       }}
     />
